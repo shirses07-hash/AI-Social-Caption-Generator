@@ -13,12 +13,27 @@ const isRetryableError = (error) => {
   const status = error?.status || error?.response?.status;
   if (RETRYABLE_STATUS_CODES.includes(status)) return true;
   const message = error?.message || "";
-  return /\b(429|503)\b/.test(message) || /service unavailable|too many requests|overloaded|high demand/i.test(message);
+  if (/\b(429|503)\b/.test(message) || /service unavailable|too many requests|overloaded|high demand/i.test(message)) {
+    return true;
+  }
+  // When Gemini's servers are overloaded, they sometimes drop the connection
+  // instead of sending a clean 503, which Node reports as "fetch failed".
+  // Treat that the same as a temporary 503 so it gets retried too.
+  return /fetch failed/i.test(message);
+};
+
+const buildBusyMessage = (error) => {
+  const status = error?.status || error?.response?.status;
+  const message = error?.message || "";
+  const isRateLimit = status === 429 || /\b429\b/.test(message) || /too many requests/i.test(message);
+  return isRateLimit
+    ? "Gemini API rate limit reached. Please wait a moment and try again."
+    : "Gemini service is temporarily unavailable. Please try again in a moment.";
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// 5 total attempts against gemini-3.6-flash only, with fixed backoff delays between them.
+// 5 total attempts against the configured model only, with fixed backoff delays between them.
 const RETRY_DELAYS_MS = [5000, 15000, 30000, 60000];
 
 const generateContentWithRetry = async (model, content) => {
@@ -29,7 +44,7 @@ const generateContentWithRetry = async (model, content) => {
     } catch (error) {
       if (!isRetryableError(error) || attempt >= RETRY_DELAYS_MS.length) {
         if (isRetryableError(error)) {
-          throw new Error("Gemini is temporarily busy. Please try again in a moment.");
+          throw new Error(buildBusyMessage(error));
         }
         throw error;
       }
@@ -47,7 +62,7 @@ const generateCaption = async ({ topic = "", platform, tone, imageData = "", mim
   try {
     const model = genAI.getGenerativeModel(
       {
-        model: "gemini-3.6-flash",
+        model: "gemini-3.5-flash-lite",
         generationConfig: {
           responseMimeType: "application/json",
           temperature: previousCaption ? 1 : 0.8,
