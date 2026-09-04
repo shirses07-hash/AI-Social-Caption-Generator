@@ -34,7 +34,7 @@ const buildBusyMessage = (error) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 5 total attempts against the configured model only, with fixed backoff delays between them.
-const RETRY_DELAYS_MS = [5000, 15000, 30000, 60000];
+const RETRY_DELAYS_MS = [3000, 5000, 10000];
 
 const generateContentWithRetry = async (model, content) => {
   let attempt = 0;
