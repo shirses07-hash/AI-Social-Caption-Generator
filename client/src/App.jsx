@@ -66,14 +66,18 @@ function App() {
     setError("");
 
     try {
-      const response = await axios.post(API_URL, {
-        topic,
-        platform,
-        tone,
-        imageData,
-        mimeType,
-        previousCaption,
-      });
+      const response = await axios.post(
+        API_URL,
+        {
+          topic,
+          platform,
+          tone,
+          imageData,
+          mimeType,
+          previousCaption,
+        },
+        { timeout: 280000 }
+      );
 
       const newResult = response.data;
       setResult(newResult);
@@ -228,6 +232,15 @@ function App() {
                 </button>
               </div>
             </article>
+
+            {result.labels?.length > 0 && (
+              <div className="detected-items">
+                <div className="section-kicker">DETECTED ITEMS</div>
+                <ul className="detected-items-list">
+                  {result.labels.map((label, i) => <li key={i}>{label}</li>)}
+                </ul>
+              </div>
+            )}
 
             {history.length > 0 && (
               <div className="history-section">

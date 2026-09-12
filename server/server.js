@@ -76,7 +76,7 @@ if (!MONGO_CONNECTION_STRING) {
 }
 
 // Start server (bind immediately so Render's health check succeeds regardless of DB state)
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);

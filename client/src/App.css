@@ -79,6 +79,10 @@ select { height: 48px; padding: 0 14px; cursor: pointer; }
 .regenerate-button:hover:not(:disabled), .secondary-button:hover { transform: translateY(-1px); }
 .regenerate-button:disabled { opacity: .65; }
 
+.detected-items { margin-top: 26px; }
+.detected-items-list { display: flex; flex-wrap: wrap; gap: 7px; list-style: none; padding: 0; margin: 0; }
+.detected-items-list li { padding: 7px 11px; border-radius: 999px; background: #f6f2ff; color: #765ed2; font-size: 11px; font-weight: 700; }
+
 .history-section { margin-top: 34px; }
 .history-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 14px; }
 .history-heading > div > span { color: #8e8798; font-size: 10px; font-weight: 800; letter-spacing: 1.2px; }

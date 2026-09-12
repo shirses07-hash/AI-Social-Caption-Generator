@@ -9,6 +9,20 @@ const captionSchema = new mongoose.Schema(
     hashtags: { type: [String], default: [] },
     labels: { type: [String], default: [] },
     imageDescription: { type: String, default: "" },
+    detectedItems: {
+      type: [
+        {
+          label: String,
+          boundingBox: {
+            x: Number,
+            y: Number,
+            width: Number,
+            height: Number,
+          },
+        },
+      ],
+      default: [],
+    },
     hasImage: { type: Boolean, default: false },
   },
   { timestamps: true }
